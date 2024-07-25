@@ -9,7 +9,7 @@ function Register() {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Reset previous errors
@@ -41,11 +41,26 @@ function Register() {
       isValid = false;
     }
 
-    // Submit if valid
+    // If form is valid, submit to backend
     if (isValid) {
-      // Register logic here
-      console.log('Registration successful');
-      // You can add further logic to submit the form or call an API
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Registration successful:', data.message);
+      } catch (error) {
+        console.error('Error registering user:', error.message);
+      }
     }
   };
 

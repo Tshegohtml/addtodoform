@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './navigation.css';
 
 function Navigation() {
   return (
@@ -13,6 +14,9 @@ function Navigation() {
         </li>
         <li>
           <Link to="/login">Login</Link>
+        </li>
+        <li>
+          <Link to="/todolist">todolist</Link>
         </li>
       </ul>
     </nav>
