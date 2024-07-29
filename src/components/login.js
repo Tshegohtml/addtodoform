@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import './login.css'; // import your CSS file
-
+import './login.css';
+import { useNavigate } from 'react-router-dom';
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-
-  const handleSubmit = (event) => {
+  const navigate = useNavigate(); 
+    const handleSubmit = (event) => {
     event.preventDefault();
 
     // Reset previous errors
@@ -31,6 +31,7 @@ function Login() {
     if (isValid) {
       // Login logic here
       console.log('Logging in...');
+      navigate("/Todolist")
 
       // You can add further logic to submit the form or call an API
     }

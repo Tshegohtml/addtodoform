@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import './register.css'; // Import your CSS file
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -9,65 +13,64 @@ function Register() {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+ 
+  const navigate=useNavigate();
+ 
+  
+const handleSubmit = async (event) => {
 
-    // Reset previous errors
-    setUsernameError('');
-    setPasswordError('');
-    setConfirmPasswordError('');
 
-    // Validation
-    let isValid = true;
 
-    if (username.trim() === '') {
-      setUsernameError('Username is required');
-      isValid = false;
+  event.preventDefault();
+
+  // Reset previous errors
+  setUsernameError('');
+  setPasswordError('');
+  setConfirmPasswordError('');
+
+  // Validation
+  let isValid = true;
+
+  if (username.trim() === '') {
+    setUsernameError('Username is required');
+    isValid = false;
+  }
+
+  if (password.trim() === '') {
+    setPasswordError('Password is required');
+    isValid = false;
+  } else if (password.length < 6) {
+    setPasswordError('Password must be at least 6 characters long');
+    isValid = false;
+  }
+
+  if (confirmPassword.trim() === '') {
+    setConfirmPasswordError('Please confirm your password');
+    isValid = false;
+  } else if (password !== confirmPassword) {
+    setConfirmPasswordError('Passwords do not match');
+    isValid = false;
+  }
+
+  // If form is valid, submit to backend
+  if (isValid) {
+    try {
+      const response = await axios.post('http://localhost:3000/api/register', {
+        username,
+        password
+      });
+      navigate("/login")
+      console.log('Registration successful:', response.data.message);
+    } catch (error) {
+      console.error('Error registering user:', error.response?.data?.error || error.message);
     }
+  }
+};
 
-    if (password.trim() === '') {
-      setPasswordError('Password is required');
-      isValid = false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long');
-      isValid = false;
-    }
-
-    if (confirmPassword.trim() === '') {
-      setConfirmPasswordError('Please confirm your password');
-      isValid = false;
-    } else if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      isValid = false;
-    }
-
-    // If form is valid, submit to backend
-    if (isValid) {
-      try {
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        console.log('Registration successful:', data.message);
-      } catch (error) {
-        console.error('Error registering user:', error.message);
-      }
-    }
-  };
 
   return (
     <div className="register-container">
       <h1>Register</h1>
-      <form className="register-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">Username:</label>
           <input
@@ -98,8 +101,7 @@ function Register() {
           />
           {confirmPasswordError && <span className="error">{confirmPasswordError}</span>}
         </div>
-        <input type="submit" value="Register" />
-      </form>
+        <input type="submit" value="Register" onClick={handleSubmit}/>
     </div>
   );
 }

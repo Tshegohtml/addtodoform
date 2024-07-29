@@ -1,33 +1,73 @@
 const sqlite3 = require('sqlite3').verbose();
 
-// Function to initialize SQLite database
-const initializeDatabase = () => {
-  return new sqlite3.Database('./path/to/your/database.db', (err) => {
-    if (err) {
-      console.error('Error connecting to database:', err.message);
-    } else {
-      console.log('Connected to the SQLite database');
-    }
-  });
-};
+// Open a database connection
+const db = new sqlite3.Database(':memory:'); // Use ':memory:' for an in-memory database or provide a file path for a file-based DB
 
-// Function to register a new user
-const registerUser = (username, password) => {
-  const db = initializeDatabase();
+// Create table
+db.serialize(() => {
+    db.run(`CREATE TABLE register (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        email TEXT NOT NULL,
+        confirm_password TEXT NOT NULL
+    )`, (err) => {
+        if (err) {
+            console.error('Error creating table:', err);
+            return;
+        }
 
-  db.serialize(() => {
-    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL)");
+        // Insert a record
+        const insertStmt = db.prepare(`INSERT INTO register (username, password, confirm_password, email)
+        VALUES (?, ?, ?, ?)`);
+        insertStmt.run("tshego", "123456", "123456", "ytmotlhalane@gmail.com", (err) => {
+            if (err) {
+                console.error('Error inserting record:', err);
+                return;
+            }
 
-    db.run("INSERT INTO users (username, password) VALUES (?, ?)", username, password, (err) => {
-      if (err) {
-        console.error('Error registering user:', err.message);
-      } else {
-        console.log('User registered successfully');
-      }
+            // Update a record
+            db.run(`UPDATE register
+            SET username = ?
+            WHERE username = ?`, ["tshego", "yvette"], (err) => {
+                if (err) {
+                    console.error('Error updating record:', err);
+                    return;
+                }
+
+                // Delete a record
+                db.run(`DELETE FROM register
+                WHERE username = ?`, ["Hans"], (err) => {
+                    if (err) {
+                        console.error('Error deleting record:', err);
+                        return;
+                    }
+
+                    // Select records
+                    db.all(`SELECT * FROM register
+                    WHERE id = ?`, [1], (err, rows) => {
+                        if (err) {
+                            console.error('Error selecting records:', err);
+                            return;
+                        }
+                        console.log('Selected records:', rows);
+
+                        // Drop the table
+                        db.run(`DROP TABLE register`, (err) => {
+                            if (err) {
+                                console.error('Error dropping table:', err);
+                            }
+
+                            // Close the database connection
+                            db.close((err) => {
+                                if (err) {
+                                    console.error('Error closing database:', err);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        });
     });
-  });
-
-  db.close();
-};
-
-module.exports = { registerUser, initializeDatabase };
+});
