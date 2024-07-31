@@ -5,6 +5,7 @@ import Register from "./components/register";
 import Login from "./components/login";
 import Navigation from "./components/navigation";
 import Todolist from "./components/Todolist";
+import './App.css';
 
 function App() {
   return (

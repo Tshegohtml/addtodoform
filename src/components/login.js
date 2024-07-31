@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import './login.css';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const navigate = useNavigate(); 
-    const handleSubmit = (event) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // Reset previous errors
-    setUsernameError('');
+    setEmailError('');
     setPasswordError('');
 
     // Validation
     let isValid = true;
 
-    if (username.trim() === '') {
-      setUsernameError('Username is required');
+    if (email.trim() === '') {
+      setEmailError('Email is required');
       isValid = false;
     }
 
@@ -29,27 +32,33 @@ function Login() {
 
     // Submit if valid
     if (isValid) {
-      // Login logic here
-      console.log('Logging in...');
-      navigate("/Todolist")
-
-      // You can add further logic to submit the form or call an API
+      try {
+        const response = await axios.post('http://localhost:3001/api/login', {
+          email,
+          password
+        });
+        const { userId } = response.data;
+        localStorage.setItem('userId', userId); // Save userId in localStorage
+        navigate("/Todolist");
+      } catch (error) {
+        console.error('Error logging in:', error.response?.data?.error || error.message);
+      }
     }
   };
 
   return (
     <div className="login-container">
       <h1>Login</h1>
-      <form className="login-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username:</label>
+          <label htmlFor="email">Email:</label>
           <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            type="email"
+            id="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
-          {usernameError && <span className="error">{usernameError}</span>}
+          {emailError && <span className="error">{emailError}</span>}
         </div>
         <div className="form-group">
           <label htmlFor="password">Password:</label>
@@ -61,7 +70,7 @@ function Login() {
           />
           {passwordError && <span className="error">{passwordError}</span>}
         </div>
-        <input type="submit" value="Login" />
+        <button type="submit">Login</button>
       </form>
     </div>
   );

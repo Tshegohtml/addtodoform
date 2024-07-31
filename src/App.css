@@ -53,6 +53,14 @@ input[type="text"], input[type="password"] {
   padding: 10px;
   margin-bottom: 20px;
   border: 1px solid #ccc;
+  border-radius: 9px;
+}
+
+input[type="text"], input[type="email"] {
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 9px;
 }
 
 input[type="submit"] {
@@ -65,5 +73,17 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
+  background-color: #3e8e41;
+}
+
+.btn{
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn:hover {
   background-color: #3e8e41;
 }
